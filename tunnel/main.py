@@ -8,13 +8,15 @@ MONSTER = "x"
 
 def print_help():
     print("""
-                       ? - help
-                       t - teleport
-                       . - wait
-                       q - quit
-                       h - left
-                       l - right
-left arrow / right arrow - left/right
+      Legend:  x = monster
+               @ = you
+               . = tunnel
+       Moves:  ? - help
+               t - teleport
+               . - wait
+               q - quit
+ h or left arrow - left
+l or right arrow - right
 
 """)
 
@@ -29,7 +31,7 @@ class Monster:
         self.pos = randpos(max_pos)
 
 def monster_delta():
-    return random.choice([1, 1, 1, 0, -1])
+    return random.choice([1, 1, 1, 1, 0, -1])
 
 class Game:
     def __init__(self, term):
@@ -138,7 +140,7 @@ class Game:
                             self.monsters.append(Monster(self.tunnel_length - 1))
                             self.teleports_left -= 1
                             self.update_score()
-                            self.show_score()
+                            self.banner("teleported!")
                         else:
                             self.update_score()
                             self.banner("no more teleports left")
