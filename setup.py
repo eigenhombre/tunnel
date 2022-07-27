@@ -1,20 +1,20 @@
 from setuptools import setup
 
 desc = "A small, 1-d Roguelike, suitable for killing a few minutes"
-homeurl = "https://github.com/eigenhombre/tunnel"
+homeurl = "https://github.com/eigenhombre/tunnerl"
 
 setup(
-    name="tunnel",
+    name="tunnerl",
     author="John Jacobsen",
     author_email="eigenhombre@gmail.com",
-    packages=["tunnel"],
+    packages=["tunnerl"],
     description=desc,
     long_description=(desc +
                       ".  See " + homeurl +
                       " for more information."),
     entry_points={
         'console_scripts': [
-            'tunnel = tunnel.main:main',
+            'tunnerl = tunnerl.main:main',
         ],
     },
     url=homeurl,
