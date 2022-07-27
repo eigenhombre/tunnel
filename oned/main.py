@@ -34,6 +34,7 @@ class Game:
         self.tunnel_length = random.randint(10, min(max(15, term.width),
                                                     70))
         self.term = term
+        self.score = 0
         self.teleports_left = 3
         self.message = "? for help"
         self.monsters = [Monster(self.tunnel_length - 1)]
@@ -72,11 +73,23 @@ class Game:
         with self.__location(0):
             pr(TUNNEL * self.tunnel_length)
 
-    def draw_game(self):
+    def banner(self, message = None):
+        if message is not None:
+            self.message = message
         with self.term.location(0, self.term.height - 2):
+            extraspace = ' ' * (self.term.width - len(self.message) - 24)
             print('Welcome to '
                   + self.term.underline('the tunnel')
-                  + f' ({self.message})!', end='')
+                  + f' ({self.message}){extraspace}', end='')
+
+    def update_score(self):
+        self.score += 1
+
+    def show_score(self):
+        self.banner(f"score: {self.score}")
+
+    def draw_game(self):
+        self.banner()
         self.draw_tunnel()
         self.draw_player()
         self.draw_monsters()
@@ -113,6 +126,7 @@ class Game:
                     elif linp == "?":
                         print_help()
                         self.draw_game()
+                        continue
                     elif linp == "t":
                         if self.teleports_left > 0:
                             self.clear_player()
@@ -120,26 +134,37 @@ class Game:
                             self.draw_player()
                             self.monsters.append(Monster(self.tunnel_length - 1))
                             self.teleports_left -= 1
+                            self.update_score()
+                            self.show_score()
+                        else:
+                            self.update_score()
+                            self.banner("no more teleports left")
                     elif linp == ".":
-                        pass
+                        self.update_score()
+                        self.show_score()
                     elif linp == "h" or inp.name == "KEY_LEFT":
                         self.clear_player()
                         self.player_pos = max(0, self.player_pos - 1)
                         self.draw_player()
+                        self.update_score()
+                        self.show_score()
                     elif linp == "l" or inp.name == "KEY_RIGHT":
                         self.clear_player()
                         self.player_pos = min(self.tunnel_length-1,
                                               self.player_pos + 1)
                         self.draw_player()
+                        self.update_score()
+                        self.show_score()
                     else:
-                        self.message = f"Key pressed was {inp.name}"
+                        self.message = f"Invalid key: {inp.name}"
                         self.draw_game()
+                        continue
                 if self.update_and_draw_monsters():
                     print()
                     print("You were eaten by a monster.")
                     break
         print()
-        print("Goodbye!")
+        print(f"Goodbye!  You survived {self.score} rounds.")
 
 def main():
     try:
