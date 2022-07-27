@@ -28,6 +28,9 @@ class Monster:
     def __init__(self, max_pos):
         self.pos = randpos(max_pos)
 
+def monster_delta():
+    return random.choice([1, 1, 1, 0, -1])
+
 class Game:
     def __init__(self, term):
         assert term.width > 15, "terminal too narrow"
@@ -99,9 +102,9 @@ class Game:
         eaten = False
         for m in self.monsters:
             if self.player_pos > m.pos:
-                target = m.pos + 1
+                target = m.pos + monster_delta()
             elif self.player_pos < m.pos:
-                target = m.pos - 1
+                target = m.pos - monster_delta()
             else:
                 target = m.pos
             if not any(other.pos == target for other in self.monsters if m != other):
