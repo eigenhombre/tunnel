@@ -1,4 +1,5 @@
 from blessed import Terminal
+from num2words import num2words
 from contextlib import contextmanager
 import random
 
@@ -30,20 +31,22 @@ class Monster:
     def __init__(self, max_pos):
         self.pos = randpos(max_pos)
 
-def monster_delta():
-    return random.choice([1, 1, 1, 1, 0, -1])
-
 class Game:
+    MAX_TELEPORTS = 5
+
     def __init__(self, term):
         assert term.width > 15, "terminal too narrow"
         self.tunnel_length = random.randint(10, min(max(15, term.width),
                                                     70))
         self.term = term
         self.score = 0
-        self.teleports_left = 3
+        self.num_teleports = 0
         self.message = "? for help"
         self.monsters = [Monster(self.tunnel_length - 1)]
         self.__newpos()
+
+    def can_teleport(self):
+        return self.num_teleports < Game.MAX_TELEPORTS
 
     @contextmanager
     def __location(self, loc):
@@ -99,18 +102,30 @@ class Game:
         self.draw_player()
         self.draw_monsters()
 
+    def __monster_delta(self, m: Monster):
+        """
+        Decide whether a monster moves towards the player or away.
+        If the player distance is greater, make the monster more
+        "confident."
+        """
+        dist_frac = abs(m.pos-self.player_pos) / self.tunnel_length
+        delta_choices = [-1, 0, 1] + [1 for _ in range(100)]
+        max_index = max(4, int(dist_frac * len(delta_choices)))
+        return random.choice(delta_choices[:max_index])
+
     def update_and_draw_monsters(self):
         self.clear_monsters()
         eaten = False
         for m in self.monsters:
+            delta = self.__monster_delta(m)
             if self.player_pos > m.pos:
-                target = m.pos + monster_delta()
+                target = m.pos + delta
             elif self.player_pos < m.pos:
-                target = m.pos - monster_delta()
+                target = m.pos - delta
             else:
                 target = m.pos
             if not any(other.pos == target for other in self.monsters if m != other):
-                m.pos = target
+                m.pos = min(self.tunnel_length - 1, max(target, 0))
             if m.pos == self.player_pos:
                 eaten = True
         self.draw_monsters()
@@ -133,12 +148,12 @@ class Game:
                         self.draw_game()
                         continue
                     elif linp == "t":
-                        if self.teleports_left > 0:
+                        if self.can_teleport() > 0:
                             self.clear_player()
                             self.__newpos()
                             self.draw_player()
                             self.monsters.append(Monster(self.tunnel_length - 1))
-                            self.teleports_left -= 1
+                            self.num_teleports += 1
                             self.update_score()
                             self.banner("teleported!")
                         else:
@@ -169,7 +184,10 @@ class Game:
                     print("You were eaten by a monster.")
                     break
         print()
-        print(f"Goodbye!  You survived {self.score} rounds.")
+        print(f"Goodbye!  You lasted {self.score} rounds against"
+              f" {num2words(len(self.monsters))}"
+              f" monster{'' if len(self.monsters) == 1 else 's' }.")
+        print(f"Final score: {self.score * len(self.monsters)}.")
 
 def main():
     try:

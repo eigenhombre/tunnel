@@ -22,5 +22,6 @@ setup(
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
     ],
-    install_requires=["blessed==1.19.1"],
+    install_requires=["blessed==1.19.1",
+                      "num2words==0.5.10"],
 )
