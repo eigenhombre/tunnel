@@ -1,6 +1,6 @@
 # tunnerl
 
-("tunnel" + "Rogue Like" == "tunneRL"...?)
+Pronounced "tunner-el": `tunnerl` = "tunnel" + "roguelike"
 
 A tiny, one-dimensional Roguelike written in Python.
 
