@@ -19,3 +19,9 @@ teleport to avoid them.  See how long you can last!
                    q - quit
      h or left arrow - left
     l or right arrow - right
+
+# Install
+
+Needs Python + `pip`:
+
+    pip install git+https://github.com/eigenhombre/tunnerl
